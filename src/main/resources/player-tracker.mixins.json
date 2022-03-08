@@ -3,10 +3,10 @@
   "minVersion": "0.8",
   "package": "tracker.mixin",
   "compatibilityLevel": "JAVA_17",
-  "mixins": [],
-  "client": [
-    "TrackerMixin"
+  "mixins": [
+    "CompassItemMixin"
   ],
+  "client": [],
   "injectors": {
     "defaultRequire": 1
   }
