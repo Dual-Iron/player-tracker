@@ -1,9 +1,2 @@
-# Fabric Example Mod
-
-## Setup
-
-For setup instructions please see the [fabric wiki page](https://fabricmc.net/wiki/tutorial:setup) that relates to the IDE that you are using.
-
-## License
-
-This template is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
+# player-tracker
+To use, hold a compass in one hand and lapis lazuli in the other. Then, right-click a lodestone. The compass will begin tracking the closest player that's on a different team than you.
