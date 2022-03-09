@@ -18,6 +18,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.math.BlockPos;
 import tracker.Utils;
 
 @Mixin(CompassItem.class)
@@ -55,10 +56,12 @@ public class CompassItemMixin {
 				return;
 			}
 
+			BlockPos plrPos = plr.getBlockPos(), targetPos = target.getBlockPos();
+
 			// Give target glowing and play sounds
 			target.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 200));
-			wld.playSound(null, target.getBlockPos(), SoundEvents.BLOCK_BELL_RESONATE, SoundCategory.PLAYERS, 1f, 1f);
-			wld.playSound(null, plr.getBlockPos(), SoundEvents.BLOCK_BELL_RESONATE, SoundCategory.PLAYERS, 1f, 1f);
+			wld.playSound(null, targetPos, SoundEvents.BLOCK_BELL_RESONATE, SoundCategory.PLAYERS, 1f, 1f);
+			wld.playSound(null, plrPos, SoundEvents.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1f, 1.25f);
 
 			Utils.giveTracker(plr, target, compass, lapis);
 		}
