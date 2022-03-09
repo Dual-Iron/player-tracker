@@ -12,11 +12,7 @@
   },
   "icon": "assets/player-tracker/icon.png",
   "environment": "*",
-  "entrypoints": {
-    "main": [
-      "tracker.TrackerMod"
-    ]
-  },
+  "entrypoints": {},
   "mixins": [
     "player-tracker.mixins.json"
   ],

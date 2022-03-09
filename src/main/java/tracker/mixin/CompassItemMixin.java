@@ -7,21 +7,27 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.CompassItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import tracker.Utils;
 
 @Mixin(CompassItem.class)
 public class CompassItemMixin {
-	@Inject(method = "useOnBlock", at = @At("HEAD"))
+	@Inject(method = "useOnBlock", at = @At("HEAD"), cancellable = true)
 	private void useOnBlock(ItemUsageContext ctx, CallbackInfoReturnable<ActionResult> ci) {
 		// Can only apply to players when clicking a lodestone
 		var plr = ctx.getPlayer();
-		if (plr == null || !ctx.getWorld().getBlockState(ctx.getBlockPos()).isOf(Blocks.LODESTONE)) {
+		var wld = ctx.getWorld();
+		if (plr == null || !wld.getBlockState(ctx.getBlockPos()).isOf(Blocks.LODESTONE)) {
 			return;
 		}
 
@@ -39,12 +45,24 @@ public class CompassItemMixin {
 			return;
 		}
 
-		LivingEntity target = Utils.findTrackable(plr, ctx.getWorld());
+		wld.playSound(null, ctx.getBlockPos(), SoundEvents.ITEM_LODESTONE_COMPASS_LOCK, SoundCategory.PLAYERS, 1f, 1f);
 
-		if (target == null) {
-			var serverPlayer = plr.getServer().getPlayerManager().getPlayer(plr.getUuid());
-			serverPlayer.sendMessage(Text.of("No enemy players or shells"), true);
-			return;
+		if (wld instanceof ServerWorld swld) {
+			LivingEntity target = Utils.findTrackable(plr, swld);
+
+			if (target == null) {
+				plr.sendMessage(Text.of("No enemy vessels"), true);
+				return;
+			}
+
+			// Give target glowing and play sounds
+			target.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 200));
+			wld.playSound(null, target.getBlockPos(), SoundEvents.BLOCK_BELL_RESONATE, SoundCategory.PLAYERS, 1f, 1f);
+			wld.playSound(null, plr.getBlockPos(), SoundEvents.BLOCK_BELL_RESONATE, SoundCategory.PLAYERS, 1f, 1f);
+
+			Utils.giveTracker(plr, target, compass, lapis);
 		}
+
+		ci.setReturnValue(ActionResult.success(wld.isClient));
 	}
 }
